@@ -12,9 +12,9 @@ export function watchEffect(f: Function): void {
     console.log('effect end', f)
 }
 
-type Target = object // тупа меняет везде тип
+type Target = object
 
-const targetMap = new WeakMap<Target, Map<string, Set<Function>>>() // [product, [[quantity, [effect]], [price, [effect]]]
+const targetMap = new WeakMap<Target, Map<string, Set<Function>>>()
 
 export function track(target: Target, key: string) {
     if (!activeEffect)
@@ -74,7 +74,6 @@ export function reactive<T extends object>(target: T): T {
     return new Proxy<T>(target, {
         get(target: any, p: string, receiver: any): any {
             const result = Reflect.get(target, p, receiver)
-            // console.log('get', { target: { ...target }, p, result })
             track(target, p)
 
             return result
@@ -82,7 +81,6 @@ export function reactive<T extends object>(target: T): T {
         set(target: any, p: string, value: any, receiver: any): boolean {
             const oldValue = target[p]
             const result = Reflect.set(target, p, value, receiver)
-            // console.log('set', { target: { ...target }, p, value, oldValue })
             if (result && oldValue !== value)
                 trigger(target, p)
 
